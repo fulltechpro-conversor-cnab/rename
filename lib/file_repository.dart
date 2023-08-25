@@ -220,27 +220,27 @@ class FileRepository {
   }
 
   Future<File?> changeIosAppName(String? appName) async {
-
     List? contentLineByLine = await readFileAsLineByline(
-      filePath: iosProjectPbxprojPath,
+      filePath: iosInfoPlistPath,
     );
     if (checkFileExists(contentLineByLine)) {
       logger.w('''
-      Ios BundleId could not be changed because,
-      The related file could not be found in that path:  $iosProjectPbxprojPath
+      Ios AppName could not be changed because,
+      The related file could not be found in that path:  $iosInfoPlistPath
       ''');
       return null;
     }
     for (var i = 0; i < contentLineByLine!.length; i++) {
-      if (contentLineByLine[i].contains('APP_DISPLAY_NAME')) {
-        contentLineByLine[i] = '				APP_DISPLAY_NAME = $appName;';
+      if (contentLineByLine[i].contains('<key>CFBundleName</key>')) {
+        contentLineByLine[i + 1] = '\t<string>$appName</string>\r';
+        break;
       }
     }
     var writtenFile = await writeFile(
-      filePath: iosProjectPbxprojPath,
+      filePath: iosInfoPlistPath,
       content: contentLineByLine.join('\n'),
     );
-    logger.i('IOS BundleIdentifier changed successfully to : $appName');
+    logger.i('IOS appname changed successfully to : $appName');
     return writtenFile;
   }
 
